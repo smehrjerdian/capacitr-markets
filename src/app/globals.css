@@ -2,26 +2,105 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+* {
+  text-transform: uppercase;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+html,
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #d1d7c4;
+  color: #002b1b;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+/* PCB circuit trace decorative lines */
+.pcb-line {
+  background-image: repeating-linear-gradient(
+    90deg,
+    #002b1b 0px,
+    #002b1b 8px,
+    transparent 8px,
+    transparent 12px
+  );
+  height: 1px;
+  opacity: 0.3;
+}
+
+.pcb-grid {
+  background-image: radial-gradient(circle, #002b1b 1px, transparent 1px);
+  background-size: 20px 20px;
+  opacity: 0.05;
+}
+
+/* Terminal cursor blink */
+@keyframes blink {
+  0%,
+  50% {
+    opacity: 1;
   }
+  51%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.cursor-blink {
+  animation: blink 1s step-end infinite;
+}
+
+/* Scan line animation */
+@keyframes scanline {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+.scanline {
+  animation: scanline 2s linear infinite;
+}
+
+/* Loading dots */
+@keyframes dots {
+  0%,
+  20% {
+    content: ".";
+  }
+  40% {
+    content: "..";
+  }
+  60% {
+    content: "...";
+  }
+  80%,
+  100% {
+    content: "";
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #d1d7c4;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #002b1b;
+  border-radius: 2px;
+}
+
+/* Input placeholder */
+input::placeholder {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Selection color */
+::selection {
+  background-color: #a2ff00;
+  color: #002b1b;
 }
