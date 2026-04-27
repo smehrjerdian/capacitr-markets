@@ -61,13 +61,51 @@ Respond as JSON: {"summary":"...","keywords":[...],"entities":[...],"tickers":[.
   const data = await res.json();
   const raw = data.choices?.[0]?.message?.content || "{}";
   const cleaned = raw.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-  return JSON.parse(cleaned);
+  const SEARCH_EXPAND_STOP = new Set([
+  "the", "a", "an", "is", "are", "was", "were", "be", "will", "would",
+  "could", "should", "may", "might", "can", "to", "of", "in", "for",
+  "on", "with", "at", "by", "from", "as", "and", "or", "but", "not",
+  "this", "that", "it", "its", "if", "about", "above", "below", "between",
+  "into", "through", "before", "after", "during", "what", "which", "who",
+  "how", "when", "where", "why", "all", "each", "some", "any", "no",
+  "more", "most", "other", "new", "next", "last", "first", "than",
+  "price", "market", "prediction", "bet", "will", "does", "did", "has",
+  "have", "had", "been", "being", "do", "going", "get", "make", "over",
+  "under", "hit", "reach", "above", "below",
+]);
+
+function expandSearchTerms(terms: string[]): string[] {
+  const expanded = new Set<string>();
+  const seen = new Set<string>();
+
+  for (const term of terms) {
+    const lower = term.toLowerCase().trim();
+    if (seen.has(lower)) continue;
+    seen.add(lower);
+    expanded.add(term);
+
+    // For multi-word terms, also add significant individual words
+    const words = lower.split(/\s+/);
+    if (words.length >= 2) {
+      for (const word of words) {
+        if (word.length < 3 || SEARCH_EXPAND_STOP.has(word)) continue;
+        if (seen.has(word)) continue;
+        seen.add(word);
+        expanded.add(word);
+      }
+    }
+  }
+
+  return Array.from(expanded);
+}
+
+return JSON.parse(cleaned);
 }
 
 async function searchPolymarket(keywords: string[], entities: string[]) {
   const allResults: any[] = [];
   const seen = new Set<string>();
-  const searchTerms = [...new Set([...entities, ...keywords])];
+  const searchTerms = expandSearchTerms([...new Set([...entities, ...keywords])]);
 
   for (const term of searchTerms.slice(0, 10)) {
     try {
